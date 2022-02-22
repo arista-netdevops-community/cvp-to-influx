@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: monitoring
+  labels:
+    app: grafana
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - envFrom:
+        - secretRef:
+            name: grafana-creds
+        image: docker.io/grafana/grafana:8.3.3
+        name: grafana
+       # volumeMounts:
+       #   - name: data-dir
+       #     mountPath: /var/lib/grafana/
+      securityContext:
+        fsGroup: 472
+      #volumes:
+      # - name: data-dir
+       #  persistentVolumeClaim:
+        #   claimName: graf-data-dir-pvc

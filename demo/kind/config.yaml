@@ -1,0 +1,12 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cvpinfluxdemo
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 9999
+    hostPort: 9999
+  - containerPort: 8086
+    hostPort: 8086
+  - containerPort: 3000
+    hostPort: 3001

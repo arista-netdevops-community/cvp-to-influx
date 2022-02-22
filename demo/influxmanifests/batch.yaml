@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: influxdb-setup
+  namespace: monitoring
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-credentials
+          image: quay.io/influxdb/influxdb:v2.0.3
+          command:
+            - influx
+          args:
+            - setup
+            - --host
+            - http://influxdb.monitoring:8086
+            - --bucket
+            - kubernetes
+            - --org
+            - InfluxData
+            - --password
+            - arista123!
+            - --username
+            - arista
+            - --token
+            - secret-token
+            - --force

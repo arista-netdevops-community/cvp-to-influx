@@ -1,0 +1,10 @@
+cvp_server: "x.x.x.x:443"
+influxurl: "http://x.x.x.x:8086/"
+influxorg: "InfluxData"
+influxbucket: "nameofbucket"
+cvptoken: "cvp token"
+influxtoken: "secret influx token"
+measurement: "interfaces"
+path: "/interfaces/interface/state/counters"
+origin: openconfig
+streammode: on_change

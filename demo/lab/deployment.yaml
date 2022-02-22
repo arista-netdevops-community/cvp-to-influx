@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb2-cluster-ip
+  namespace: monitoring
+spec:
+  type: ClusterIP
+  selector:
+    app: influxdb2
+  ports:
+  - name: api
+    port: 9999
+  - name: gui
+    port: 8086
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-node-ip2
+  labels:
+    app: influxdb2
+  namespace: monitoring
+spec:
+  ports:
+  - port: 8086
+    protocol: TCP
+    nodePort: 30301
+    targetPort: 8086
+  selector:
+    app: influxdb2
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: influxdb2
+  namespace: monitoring
+spec:
+  serviceName: "influxdb2"
+  selector:
+    matchLabels:
+      app: influxdb2
+  template:
+    metadata:
+      labels:
+        app: influxdb2
+    spec:
+      serviceAccount: cthulhu
+      containers:
+      - name: influxdb
+        image: quay.io/influxdb/influxdb:v2.0.3
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: 1
+        ports:
+        - name: api
+          containerPort: 9999
+        - name: gui
+          containerPort: 8086
+        volumeMounts:
+        - name: data
+          mountPath: /root/.influxdbv2
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        storageClassName: nfs-local
+        resources:
+          requests:
+            storage: 1Gi
+        volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: influxdb2-pv
+  namespace: monitoring
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /mnt/data/flux2
+  storageClassName: nfs-local
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - dmz-k8s-3

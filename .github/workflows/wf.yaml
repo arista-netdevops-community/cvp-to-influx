@@ -1,0 +1,42 @@
+on: [push, pull_request]
+name: Go CI
+jobs:
+  ci:
+    strategy:
+      matrix:
+        go-version: [1.16.x]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: go test
+      run: go test ./...
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v2
+
+  ci-cache:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16.x
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+          ~/Library/Caches/go-build
+          %LocalAppData%\go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Run Go test
+      run: go test ./...
