@@ -11,10 +11,10 @@ import (
 
 	"github.com/aristanetworks/goarista/gnmi"
 
-	pb "github.com/openconfig/gnmi/proto/gnmi"
 	cvinv "github.com/arista-netdevops-community/cvp-to-influx/pkg/cvinv"
 	"github.com/arista-netdevops-community/cvp-to-influx/pkg/cvsendinflux"
 	cvstream "github.com/arista-netdevops-community/cvp-to-influx/pkg/cvstream"
+	pb "github.com/openconfig/gnmi/proto/gnmi"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,7 +41,7 @@ func main() {
 	yamlFile, err := ioutil.ReadFile(*yamlcfg)
 
 	if err != nil {
-		log.Print("Cannot find yaml file. #%v ", err)
+		log.Print("Cannot find yaml file", err)
 		os.Exit(1)
 	}
 	err = yaml.Unmarshal(yamlFile, &c)
